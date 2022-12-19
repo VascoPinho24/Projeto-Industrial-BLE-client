@@ -1,5 +1,17 @@
 #include <Arduino.h>
 #include "BLEDevice.h"
+#include <Wire.h>
+#include "DFRobot_INA219.h"
+
+DFRobot_INA219_IIC     ina219(&Wire, INA219_I2C_ADDRESS4);
+
+#define SCL_PIN 18
+#define SDA_PIN 17
+
+// Revise the following two paramters according to actula reading of the INA219 and the multimeter
+// for linearly calibration
+float ina219Reading_mA = 128.0;
+float extMeterReading_mA = 123.8;
 
 /* Specify the Service UUID of Server */
 static BLEUUID serviceUUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
@@ -142,13 +154,24 @@ void setup()
   pBLEScan->setWindow(449);
   pBLEScan->setActiveScan(true);
   pBLEScan->start(5, false);
+  
+  Wire.begin(SDA_PIN, SCL_PIN, 400000UL);
+  while(!Serial);
+
+  Serial.println();
+  while(ina219.begin() != true) {
+      Serial.println("INA219 begin faild");
+      delay(2000);
+  }
+  ina219.linearCalibrate(ina219Reading_mA, extMeterReading_mA);
+  Serial.println();
 }
 
 
 void loop()
 {
 
-  pot_voltage = pot_value(analogInPin);
+  pot_voltage = ina219.getCurrent_mA();
 
   /* If the flag "doConnect" is true, then we have scanned for and found the desired
      BLE Server with which we wish to connect.  Now we connect to it.  Once we are 
