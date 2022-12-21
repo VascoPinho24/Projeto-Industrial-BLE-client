@@ -1,0 +1,34 @@
+int value;
+const float vpp= 0.0008787346221;
+float current;
+int sumval;
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+  analogReadResolution(12);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  value=analogRead(14);
+  sumval=0;
+
+  for (int i=0;i<1000;i++)
+  {
+    value=analogRead(14);
+    sumval=sumval+value;
+    delay(1);
+  }
+
+  value=sumval/1000;
+  value=value-3024;
+
+  current=value*vpp;
+  current=current*1000;
+  current=current+5;
+
+  Serial.print(current);
+  Serial.println("mA");
+  delay(1);
+}
