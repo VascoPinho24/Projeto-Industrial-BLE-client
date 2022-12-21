@@ -171,7 +171,7 @@ void setup()
 void loop()
 {
 
-  pot_voltage = ina219.getCurrent_mA();
+  pot_voltage = ina219.getCurrent_mA()+2;
 
   /* If the flag "doConnect" is true, then we have scanned for and found the desired
      BLE Server with which we wish to connect.  Now we connect to it.  Once we are 
